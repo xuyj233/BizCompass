@@ -1,0 +1,117 @@
+# Bizcompass Benchmark Configuration Example
+# This file demonstrates all available configuration options
+
+# Path settings
+paths:
+  dataset_path: "Dataset"
+  output_path: "results"
+  model_path: "/path/to/local/model"
+  log_path: "results/logs"
+  config_path: "config"
+
+# API configuration
+api:
+  api_key: ""  # Set via environment variable API_KEY
+  base_url: "https://api.openai.com/v1"
+  max_workers: 20
+  request_timeout: 60
+  max_retries: 3
+  retry_delay: 1.0
+  rate_limit_delay: 0.1
+
+# Model configuration
+model:
+  model_type: "api"  # "api" or "local"
+  model_name: "gpt-4o"
+  temperature: 0.0
+  top_p: 0.95
+  max_tokens_choice: 512
+  max_tokens_general: 8192
+  max_new_tokens_default: 8192
+  max_new_tokens_choice: 256
+  
+  # Local model specific settings
+  dtype: "float16"  # float16, float32, bfloat16
+  device_map: "auto"
+  trust_remote_code: true
+  use_cache: true
+  
+  # Generation parameters
+  do_sample: false
+  num_beams: 1
+  early_stopping: true
+  no_repeat_ngram_size: 3
+  repetition_penalty: 1.1
+  
+  # Anti-thinking settings
+  suppress_thinking: true
+  thinking_keywords:
+    - "thinking"
+    - "Thinking"
+    - "Let me think"
+    - "let me think"
+
+# Batch processing configuration
+batch:
+  default_batch_size: 64
+  max_retry_attempts: 3
+  continue_on_error: true
+  save_intermediate_results: true
+  resume_from_checkpoint: true
+  
+  # OOM handling
+  enable_oom_handling: true
+  oom_retry_attempts: 3
+  oom_batch_size_reduction_factor: 0.5
+  min_batch_size: 1
+
+# Evaluation configuration
+evaluation:
+  evaluator_model: "gpt-4o"
+  evaluation_timeout: 120
+  max_evaluation_retries: 3
+  enable_auto_evaluation: true
+  
+  # Answer extraction settings
+  enable_json_repair: true
+  strict_answer_extraction: false
+  upstream_saturation_keyword: "Saturation Detected"
+
+# Logging configuration
+logging:
+  log_level: "INFO"
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_to_file: true
+  log_to_console: true
+  max_log_file_size: 10485760  # 10MB
+  backup_count: 5
+
+# Processing configuration
+processing:
+  domains:
+    - "Econ"
+    - "Fin"
+    - "OM"
+    - "Stat"
+  question_types:
+    - "Single Choice"
+    - "Multiple Choice"
+    - "General QA"
+    - "Table QA"
+  
+  # File processing settings
+  encoding: "utf-8"
+  backup_encodings:
+    - "utf-8-sig"
+    - "latin1"
+  validate_json: true
+  auto_repair_json: true
+  
+  # Threading settings
+  max_workers: 20
+  thread_safe_writing: true
+
+# Global settings
+debug_mode: false
+dry_run: false
+verbose: false
