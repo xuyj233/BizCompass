@@ -88,28 +88,19 @@ class PromptManager:
         Returns:
             The evaluation prompt string
         """
-        if domain and question_type:
-            # Domain and question type specific evaluation prompt
-            return f"""You are an expert evaluator for {domain} {question_type} questions. Please evaluate the following answer for correctness and quality.
-
-Please provide your evaluation in the following JSON format:
-{{
-    "correctness": "correct" or "incorrect" or "partially_correct",
-    "score": 0.0 to 1.0,
-    "explanation": "Brief explanation of your evaluation",
-    "suggestions": "Any suggestions for improvement"
-}}"""
-        else:
-            # Generic evaluation prompt
-            return """You are an expert evaluator. Please evaluate the following answer for correctness and quality.
-
-Please provide your evaluation in the following JSON format:
-{
-    "correctness": "correct" or "incorrect" or "partially_correct",
-    "score": 0.0 to 1.0,
-    "explanation": "Brief explanation of your evaluation",
-    "suggestions": "Any suggestions for improvement"
-}"""
+        if domain:
+            domain_lower = domain.lower()
+            if domain_lower == "econ":
+                return EVALUATION_PROMPT_ECON
+            elif domain_lower == "fin":
+                return EVALUATION_PROMPT_FIN
+            elif domain_lower == "om":
+                return EVALUATION_PROMPT_OM
+            elif domain_lower == "stat":
+                return EVALUATION_PROMPT_STAT
+        
+        # Default to generic evaluation prompt
+        return EVALUATION_PROMPT_GENERIC
     
     def get_evaluation_user_template(self) -> str:
         """Get the user template for evaluation."""

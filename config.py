@@ -66,7 +66,7 @@ class PathConfig:
 class APIConfig:
     """API configuration settings."""
     api_key: str = ""
-    base_url: str = "https://api.openai.com/v1"
+    base_url: str = " https://vip.yi-zhan.top"
     max_workers: int = 20
     request_timeout: int = 60
     max_retries: int = 3
@@ -132,7 +132,7 @@ class BatchConfig:
 @dataclass
 class EvaluationConfig:
     """Evaluation configuration settings."""
-    evaluator_model: str = "gpt-4o"
+    evaluator_model: str = "gpt-5-nano"
     evaluation_timeout: int = 120
     max_evaluation_retries: int = 3
     enable_auto_evaluation: bool = True
@@ -257,12 +257,13 @@ class BizcompassConfig:
     
     def _validate(self):
         """Validate configuration settings."""
-        # Validate paths
-        if not self.paths.dataset_path.exists():
-            raise ValueError(f"Dataset path does not exist: {self.paths.dataset_path}")
+        # Validate paths (skip dataset path validation in debug mode)
+        if not (self.debug_mode or self.debug_inference or self.debug_evaluation):
+            if not self.paths.dataset_path.exists():
+                raise ValueError(f"Dataset path does not exist: {self.paths.dataset_path}")
         
         # Validate API settings (skip validation in debug mode)
-        if not (self.debug_mode or self.debug_inference):
+        if not (self.debug_mode or self.debug_inference or self.debug_evaluation):
             if (self.model.model_type == ModelType.API and not self.api.api_key):
                 raise ValueError("API key is required for API model type")
         

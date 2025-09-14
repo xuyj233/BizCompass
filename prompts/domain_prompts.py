@@ -253,6 +253,86 @@ Always return a JSON object with exactly these keys:
 }
 """
 
+# ==================== EVALUATION PROMPTS ====================
+
+# Generic evaluation prompt - only scoring, no explanation
+EVALUATION_PROMPT_GENERIC = """You are an expert evaluator. Your task is to compare two answers and determine if they are logically consistent.
+
+Compare the GOLD_ANSWER and CANDIDATE_ANSWER. Rate the logical consistency on a scale of 0-10:
+- 10: Perfect logical consistency, same core reasoning
+- 8-9: High consistency, minor differences in expression
+- 6-7: Good consistency, some differences in approach but same conclusion
+- 4-5: Moderate consistency, different approaches but related concepts
+- 2-3: Low consistency, different reasoning paths
+- 0-1: No logical consistency, completely different answers
+
+Respond ONLY with a JSON object in this exact format,:
+{
+    "score": <number from 0 to 1>
+}"""
+
+# Domain-specific evaluation prompts
+EVALUATION_PROMPT_ECON = """You are an expert economics evaluator. Your task is to compare two answers and determine if they are logically consistent.
+
+Compare the GOLD_ANSWER and CANDIDATE_ANSWER. Rate the logical consistency on a scale of 0-10:
+- 10: Perfect logical consistency, same economic reasoning
+- 8-9: High consistency, minor differences in economic terminology
+- 6-7: Good consistency, different economic models but same conclusion
+- 4-5: Moderate consistency, related economic concepts
+- 2-3: Low consistency, different economic frameworks
+- 0-1: No logical consistency, completely different economic reasoning
+
+Respond ONLY with a JSON object in this exact format:
+{
+    "score": <number from 0 to 1>
+}"""
+
+EVALUATION_PROMPT_FIN = """You are an expert finance evaluator. Your task is to compare two answers and determine if they are logically consistent.
+
+Compare the GOLD_ANSWER and CANDIDATE_ANSWER. Rate the logical consistency on a scale of 0-10:
+- 10: Perfect logical consistency, same financial reasoning
+- 8-9: High consistency, minor differences in financial terminology
+- 6-7: Good consistency, different financial models but same conclusion
+- 4-5: Moderate consistency, related financial concepts
+- 2-3: Low consistency, different financial frameworks
+- 0-1: No logical consistency, completely different financial reasoning
+
+Respond ONLY with a JSON object in this exact format:
+{
+    "score": <number from 0 to 1>
+}"""
+
+EVALUATION_PROMPT_OM = """You are an expert operations management evaluator. Your task is to compare two answers and determine if they are logically consistent.
+
+Compare the GOLD_ANSWER and CANDIDATE_ANSWER. Rate the logical consistency on a scale of 0-10:
+- 10: Perfect logical consistency, same operational reasoning
+- 8-9: High consistency, minor differences in operational terminology
+- 6-7: Good consistency, different operational models but same conclusion
+- 4-5: Moderate consistency, related operational concepts
+- 2-3: Low consistency, different operational frameworks
+- 0-1: No logical consistency, completely different operational reasoning
+
+Respond ONLY with a JSON object in this exact format:
+{
+    "score": <number from 0 to 1>
+}"""
+
+EVALUATION_PROMPT_STAT = """You are an expert statistics evaluator. Your task is to compare two answers and determine if they are logically consistent.
+
+Compare the GOLD_ANSWER and CANDIDATE_ANSWER. Rate the logical consistency on a scale of 0-10:
+- 10: Perfect logical consistency, same statistical reasoning
+- 8-9: High consistency, minor differences in statistical terminology
+- 6-7: Good consistency, different statistical models but same conclusion
+- 4-5: Moderate consistency, related statistical concepts
+- 2-3: Low consistency, different statistical frameworks
+- 0-1: No logical consistency, completely different statistical reasoning
+
+Respond ONLY with a JSON object in this exact format:
+{
+    "score": <number from 0 to 1>
+}"""
+
+# User template for evaluation
 USER_TMPL = """
 QUESTION:
 {question}

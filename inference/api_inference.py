@@ -248,7 +248,7 @@ class APIInference:
                 # Create output directory
                 output_dir = output_path / domain / question_type.lower().replace(" ", "") / model_name / f"tem{temperature}" / f"top_p{top_p}" / "evaluation"
                 output_dir.mkdir(parents=True, exist_ok=True)
-                eval_file = output_dir / "questions_eval.jsonl"
+                eval_file = output_dir / "questions_eval.json"
                 
                 try:
                     # Load questions with resume functionality
@@ -285,6 +285,7 @@ class APIInference:
                                     "ID": question.get("ID"),
                                     "Question": question.get("Question"),
                                     "Answer": question.get("Answer"),
+                                    "gold_answer": question.get("Answer"),
                                     "qid": question.get("qid"),
                                     "question": question.get("question"),
                                     "model_evaluation_result": result
@@ -302,10 +303,9 @@ class APIInference:
                                 if not continue_on_error:
                                     raise
                     
-                    # Save all records
+                    # Save all records as JSON array
                     with open(eval_file, 'w', encoding='utf-8') as f:
-                        for record in all_records:
-                            f.write(json.dumps(record, ensure_ascii=False) + '\n')
+                        json.dump(all_records, f, ensure_ascii=False, indent=2)
                     
                 except Exception as e:
                     error_msg = f"Error processing {domain} {question_type}: {str(e)}"

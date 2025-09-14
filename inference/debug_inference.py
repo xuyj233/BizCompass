@@ -231,8 +231,15 @@ def debug_call_llm(qobj: Dict[str, Any], llm_model: str, question_type: str,
         print(f"{Fore.YELLOW}   Extracted text: {extracted_answer}")
         
         # Step 13: For choice questions, try to extract answer
-        if question_type.lower() in ["single", "multiple"]:
+        # Check both original and mapped question types
+        is_choice_question = (
+            question_type.lower() in ["single choice", "multiple choice"] or
+            mapped_question_type in ["single", "multiple"]
+        )
+        
+        if is_choice_question:
             print(f"{Fore.CYAN}📋 Step 13: Extracting answer for choice question")
+            print(f"{Fore.YELLOW}   Question type: {question_type} -> {mapped_question_type}")
             # Try to extract answer from text
             answer_match = re.search(r'[A-D]', extracted_answer)
             if answer_match:
@@ -321,7 +328,7 @@ class DebugInference:
                 # Create output directory
                 output_dir = output_path / domain / question_type.lower().replace(" ", "") / model_name / f"tem{temperature}" / f"top_p{top_p}" / "evaluation"
                 output_dir.mkdir(parents=True, exist_ok=True)
-                eval_file = output_dir / "questions_eval.jsonl"
+                eval_file = output_dir / "questions_eval.json"
                 
                 try:
                     # Load questions with resume functionality
@@ -360,6 +367,7 @@ class DebugInference:
                                 "ID": question.get("ID"),
                                 "Question": question.get("Question"),
                                 "Answer": question.get("Answer"),
+                                "gold_answer": question.get("Answer"),
                                 "qid": question.get("qid"),
                                 "question": question.get("question"),
                                 "model_evaluation_result": result
@@ -378,11 +386,10 @@ class DebugInference:
                             if not continue_on_error:
                                 raise
                     
-                    # Save all records
+                    # Save all records as JSON array
                     print(f"{Fore.CYAN}💾 Saving {len(all_records)} records to {eval_file}")
                     with open(eval_file, 'w', encoding='utf-8') as f:
-                        for record in all_records:
-                            f.write(json.dumps(record, ensure_ascii=False) + '\n')
+                        json.dump(all_records, f, ensure_ascii=False, indent=2)
                     print(f"{Fore.GREEN}   ✅ Successfully saved records")
                     
                 except Exception as e:

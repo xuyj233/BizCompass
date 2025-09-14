@@ -66,7 +66,6 @@ def _looks_like_upstream_error(s: str | None) -> bool:
     capacity_clues = [
         "rate limit", "capacity", "overload", "saturated", "temporarily unavailable",
         "upstream", "model_not_found",
-        "负载已饱和", "暂无可用渠道", "暂不可用", "暂时不可用", "通道不可用", "达到上限",
     ]
     return any(c in t for c in (http_clues + capacity_clues))
 
@@ -81,9 +80,9 @@ def _is_incomplete_placeholder(raw: str | None,
     s = (raw or "").strip()
     if not s:
         return True
-    # Pure placeholders: "Answer:", "Final answer:", "Solution:", "答案：" etc.
+    # Pure placeholders: "Answer:", "Final answer:", "Solution:", etc.
     import re
-    if re.match(r'^(answer|final\s*answer|solution|答案)\s*[:：]?\s*$', s, flags=re.I):
+    if re.match(r'^(answer|final\s*answer|solution)\s*[:：]?\s*$', s, flags=re.I):
         return True
     # Very short generic output for general QA
     if question_type.lower() not in ("single", "multiple") and len(s) < 12:
@@ -243,10 +242,20 @@ def load_questions(
     if eval_jsonl_path.exists():
         print(f"    [Info] Resuming from existing file: {eval_jsonl_path.name}")
         try:
-            with eval_jsonl_path.open("r", encoding="utf-8") as f_jsonl:
-                for line_num, line in enumerate(f_jsonl):
+            with eval_jsonl_path.open("r", encoding="utf-8") as f_json:
+                data = json.load(f_json)
+                
+                # Handle both single object and array formats
+                if isinstance(data, dict):
+                    records = [data]
+                elif isinstance(data, list):
+                    records = data
+                else:
+                    print(f"    [Warning] Unexpected JSON format in {eval_jsonl_path.name}")
+                    records = []
+                
+                for record in records:
                     try:
-                        record = json.loads(line)
                         qid = get_question_id(record)
 
                         # Only add well‑formed, non‑empty QIDs to the skip list.
@@ -261,10 +270,9 @@ def load_questions(
                             # it to decide skipping logic.
                             previously_processed_records.append(record)
 
-                    except json.JSONDecodeError:
+                    except Exception as e:
                         print(
-                            f"    [Warning] Skipped malformed JSON line "
-                            f"{line_num + 1} in {eval_jsonl_path.name}"
+                            f"    [Warning] Skipped malformed record in {eval_jsonl_path.name}: {e}"
                         )
 
             # Check file completeness: only completely skip if valid record count equals source file question count

@@ -2,6 +2,51 @@
 
 A comprehensive benchmark for evaluating Large Language Models (LLMs) in business contexts including Economics, Finance, Operations Management, and Statistics.
 
+## Project Structure
+
+```
+Bizcompass/
+├── bizcompass.py              # Main entry point
+├── config.py                  # Configuration management
+├── config_example.yaml        # Example configuration file
+├── requirements.txt           # Python dependencies
+├── README.md                  # This file
+├── EVALUATION_CONFIG_GUIDE.md # Evaluation configuration guide
+├── EVALUATION_PATH_GUIDE.md   # Evaluation path guide
+│
+├── Dataset/                   # Benchmark datasets
+│   ├── Econ/                 # Economics questions
+│   ├── Fin/                  # Finance questions
+│   ├── OM/                   # Operations Management questions
+│   └── Stat/                 # Statistics questions
+│       ├── General QA/       # Open-ended questions
+│       ├── Multiple Choice/  # Multiple choice questions
+│       ├── Single Choice/    # Single choice questions
+│       └── Table QA/         # Table-based questions
+│
+├── config/                   # Configuration files
+├── dataloader/              # Data loading utilities
+│   └── dataloader.py
+├── evaluation/              # Evaluation modules
+│   ├── evaluator.py         # LLM-based evaluator
+│   └── metrics.py           # Metrics calculation
+├── inference/               # Inference modules
+│   ├── api_inference.py     # API-based inference
+│   ├── debug_inference.py   # Debug inference
+│   └── local_inference.py   # Local model inference
+├── prompts/                 # Prompt management
+│   ├── domain_prompts.py    # Domain-specific prompts
+│   └── prompt_manager.py    # Prompt manager
+├── scripts/                 # Utility scripts
+│   └── batch_inference.py   # Batch processing
+├── utils/                   # Utility functions
+│   └── utils.py
+├── results/                 # Output directory
+│   ├── logs/               # Log files
+│   └── result/             # Experiment results
+└── logs/                   # Additional logs
+```
+
 ## Quick Start
 
 ### 1. Installation
@@ -58,6 +103,41 @@ python bizcompass.py inference \
 ```bash
 python bizcompass.py inference --model_name gpt-4o --debug
 ```
+
+### 4. Run Full Pipeline (Inference + Evaluation)
+
+The pipeline command runs both inference and evaluation in sequence, providing immediate score results:
+
+#### Basic Pipeline
+```bash
+python bizcompass.py pipeline --model_name gpt-4o
+```
+
+#### Pipeline with Debug Mode
+```bash
+python bizcompass.py pipeline \
+  --model_name test-model \
+  --debug \
+  --domains "Econ" \
+  --question_types "Single Choice"
+```
+
+#### Custom Pipeline Configuration
+```bash
+python bizcompass.py pipeline \
+  --model_name claude-3-sonnet \
+  --domains "Econ,Fin" \
+  --question_types "Single Choice,General QA" \
+  --temperature 0.8 \
+  --evaluator_model "gpt-4o"
+```
+
+The pipeline will:
+1. 🚀 Run inference on the specified model
+2. 📊 Run evaluation using the specified evaluator model
+3. 🎯 Display final scores:
+   - **Choice Questions**: Accuracy percentage
+   - **Open-ended Questions**: Average score (0.0-1.0)
 
 ## Configuration Guide
 
@@ -135,6 +215,23 @@ python scripts/batch_inference.py \
   --models "gpt-4o,claude-3-sonnet" \
   --temperatures "0.0,0.8" \
   --top_ps "0.95"
+```
+
+### 3. Batch Evaluation
+
+```bash
+# Evaluate existing inference results
+python scripts/batch_evaluation_script.py \
+  --models "gpt-4o,claude-3-sonnet" \
+  --domains "Econ,Fin" \
+  --question_types "Single Choice,Multiple Choice" \
+  --evaluator_model "gpt-4o"
+
+# List available inference results
+python scripts/batch_evaluation_script.py --list_results
+
+# Dry run to see what would be evaluated
+python scripts/batch_evaluation_script.py --dry_run --models "gpt-4o"
 ```
 
 ### 3. Full Pipeline (Inference + Evaluation)
@@ -358,19 +455,10 @@ python scripts/batch_inference.py \
 ### Custom Prompts
 Modify prompts in `prompts/domain_prompts.py` for custom behavior.
 
-### Experiment Management
-```bash
-# List experiments
-python experiment_recorder.py list
-
-# Show experiment details
-python experiment_recorder.py show experiment_id --type inference
-```
-
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch  
 3. Make your changes
 4. Test with debug mode
 5. Submit a pull request
